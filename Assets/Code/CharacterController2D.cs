@@ -16,6 +16,7 @@ public class CharacterController2D : MonoBehaviour {
   public bool CanJump { get { return false; } }
   public bool HandleCollisions { get; set; }
   public ControllerParameters2D Parameters { get { return _overrideParameters ?? DefaultParameters; } }
+  public GameObject StandingOn { get; private set; }
 
   private Vector2 _velocity;
   private Transform _transform;
@@ -147,7 +148,48 @@ public class CharacterController2D : MonoBehaviour {
   }
 
   private void MoveVertically(ref Vector2 deltaMovement) {
+    var isGoingUp = deltaMovement.y > 0;
+    var rayDistance = Mathf.Abs(deltaMovement.y + SkinWidth);
+    var rayDirection = isGoingUp ? Vector2.up : -Vector2.up;
+    var rayOrigin = isGoingUp ? _raycastTopLeft : _raycastBottomLeft;
 
+    rayOrigin.x += deltaMovement.x;
+
+    var standingOnDistance = float.MaxValue;
+
+    for(var i = 0; i < TotalVerticalRays; ++i) {
+      var rayVector = new Vector2(rayOrigin.x + (i * _horizontalDistanceBetweenRays), rayOrigin.y);
+      Debug.DrawRay(rayVector, rayDirection * rayDistance, Color.red);
+
+      var rayCastHit = Physics2D.Raycast(rayVector, rayDirection, rayDistance, PlatformMask);
+      if(!rayCastHit)
+        continue;
+
+      if(!isGoingUp) {
+        var verticalDistanceToHit = _transform.position.y - rayCastHit.point.y;
+        if(verticalDistanceToHit < standingOnDistance) {
+          standingOnDistance = verticalDistanceToHit;
+          StandingOn = rayCastHit.collider.gameObject;
+        }
+      }
+
+      deltaMovement.y = rayCastHit.point.y - rayVector.y;
+      rayDistance = Mathf.Abs(deltaMovement.y);
+
+      if(isGoingUp) {
+        deltaMovement.y -= SkinWidth;
+        State.IsCollidingAbove = true;
+      } else {
+        deltaMovement.y += SkinWidth;
+        State.IsCollidingBelow = true;
+      }
+
+      if(!isGoingUp && deltaMovement.y > 0.0001f)
+        State.IsMovingUpSlope = true;
+
+      if(rayDistance < SkinWidth + 0.0001f)
+        break;
+    }
   }
 
   private void HandleVerticalSlope(ref Vector2 deltaMovement) {
