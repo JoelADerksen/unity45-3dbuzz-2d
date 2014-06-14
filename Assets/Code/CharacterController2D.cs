@@ -13,16 +13,26 @@ public class CharacterController2D : MonoBehaviour {
 
   public ControllerState2D State { get; private set; }
   public Vector2 Velocity { get { return _velocity; } }
-  public bool CanJump { get { return false; } }
   public bool HandleCollisions { get; set; }
   public ControllerParameters2D Parameters { get { return _overrideParameters ?? DefaultParameters; } }
   public GameObject StandingOn { get; private set; }
+  public bool CanJump {
+    get {
+      if(Parameters.JumpRestrictions == ControllerParameters2D.JumpBehavior.CanJumpAnywhere)
+        return _jumpIn <= 0;
+      else if(Parameters.JumpRestrictions == ControllerParameters2D.JumpBehavior.CanJumpOnGround)
+        return State.IsGrounded;
+
+      return false;
+    }
+  }
 
   private Vector2 _velocity;
   private Transform _transform;
   private Vector3 _localScale;
   private BoxCollider2D _boxCollider;
   private ControllerParameters2D _overrideParameters;
+  private float _jumpIn;
   private Vector3
     _raycastTopLeft,
     _raycastBottomLeft,
@@ -63,10 +73,13 @@ public class CharacterController2D : MonoBehaviour {
   }
 
   public void Jump() {
-
+    // TODO: Moving platform support
+    AddForce(new Vector2(0, Parameters.JumpMagnitude));
+    _jumpIn = Parameters.JumpFrequency;
   }
 
   public void LateUpdate() {
+    _jumpIn -= Time.deltaTime;
     _velocity.y += Parameters.Gravity * Time.deltaTime;
     Move(Velocity * Time.deltaTime);
   }
