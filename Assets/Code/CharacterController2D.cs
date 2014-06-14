@@ -123,8 +123,6 @@ public class CharacterController2D : MonoBehaviour {
       var rayVector = new Vector2(rayOrigin.x, rayOrigin.y + (i * _verticalDistanceBetweenRays));
       Debug.DrawRay(rayVector, rayDirection * rayDistance, Color.red);
 
-      Debug.Log("asdf");
-
       var rayCastHit = Physics2D.Raycast(rayVector, rayDirection, rayDistance, PlatformMask);
       if(!rayCastHit)
         continue;
