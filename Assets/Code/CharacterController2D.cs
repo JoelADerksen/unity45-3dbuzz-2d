@@ -106,6 +106,9 @@ public class CharacterController2D : MonoBehaviour {
         MoveHorizontally(ref deltaMovement);
 
       MoveVertically(ref deltaMovement);
+
+      CorrectHorizontalPlacement(ref deltaMovement, true);
+      CorrectHorizontalPlacement(ref deltaMovement, false);
     }
 
     _transform.Translate(deltaMovement, Space.World);
@@ -151,6 +154,31 @@ public class CharacterController2D : MonoBehaviour {
     }
 
     StandingOn = null;
+  }
+
+  private void CorrectHorizontalPlacement(ref Vector2 deltaMovement, bool isRight) {
+    var halfWidth = _boxCollider.size.x * _localScale.x / 2.0f;
+    var rayOrigin = isRight ? _raycastBottomRight : _raycastBottomLeft;
+
+    if(isRight)
+      rayOrigin.x -= (halfWidth - SkinWidth);
+    else
+      rayOrigin.x += (halfWidth - SkinWidth);
+
+    var rayDirection = isRight ? Vector2.right : -Vector2.right;
+    var offset = 0.0f;
+
+    for(var i = 1; i < TotalHorizontalRays - 1; ++i) {
+      var rayVector = new Vector2(deltaMovement.x + rayOrigin.x, deltaMovement.y + rayOrigin.y + (i * _verticalDistanceBetweenRays));
+
+      var rayCastHit = Physics2D.Raycast(rayVector, rayDirection, halfWidth, PlatformMask);
+      if(!rayCastHit)
+        continue;
+
+      offset = isRight ? ((rayCastHit.point.x - _transform.position.x) - halfWidth) : (halfWidth - (_transform.position.x - rayCastHit.point.x));
+    }
+
+    deltaMovement.x += offset;
   }
 
   private void CalculateRayOrigins() {
