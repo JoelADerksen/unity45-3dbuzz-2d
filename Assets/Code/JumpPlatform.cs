@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 public class JumpPlatform : MonoBehaviour {
   public float JumpMagnitude = 20.0f;

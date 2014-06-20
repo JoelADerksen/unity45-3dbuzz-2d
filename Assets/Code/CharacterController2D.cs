@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 public class CharacterController2D : MonoBehaviour {
   private const float SkinWidth = 0.02f;
@@ -18,13 +17,17 @@ public class CharacterController2D : MonoBehaviour {
   public GameObject StandingOn { get; private set; }
   public Vector3 PlatformVelocity { get; private set; }
   public bool CanJump {
-    get {
-      if(Parameters.JumpRestrictions == ControllerParameters2D.JumpBehavior.CanJumpAnywhere)
-        return _jumpIn <= 0;
-      else if(Parameters.JumpRestrictions == ControllerParameters2D.JumpBehavior.CanJumpOnGround)
-        return State.IsGrounded;
+    get
+    {
+        switch (Parameters.JumpRestrictions)
+        {
+            case ControllerParameters2D.JumpBehavior.CanJumpAnywhere:
+                return _jumpIn <= 0;
+            case ControllerParameters2D.JumpBehavior.CanJumpOnGround:
+                return State.IsGrounded;
+        }
 
-      return false;
+        return false;
     }
   }
 
@@ -80,7 +83,6 @@ public class CharacterController2D : MonoBehaviour {
   }
 
   public void Jump() {
-    // TODO: Moving platform support
     AddForce(new Vector2(0, Parameters.JumpMagnitude));
     _jumpIn = Parameters.JumpFrequency;
   }
@@ -280,6 +282,7 @@ public class CharacterController2D : MonoBehaviour {
     if(!rayCastHit)
       return;
 
+// ReSharper disable once CompareOfFloatsByEqualityOperator
     var isMovingDownSlope = Mathf.Sign(rayCastHit.normal.x) == Mathf.Sign(deltaMovement.x);
     if(!isMovingDownSlope)
       return;

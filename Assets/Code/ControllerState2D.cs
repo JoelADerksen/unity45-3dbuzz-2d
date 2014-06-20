@@ -1,7 +1,4 @@
-﻿using UnityEngine;
-using System;
-
-public class ControllerState2D {
+﻿public class ControllerState2D {
   public bool IsCollidingRight { get; set; }
   public bool IsCollidingLeft { get; set; }
   public bool IsCollidingAbove { get; set; }
