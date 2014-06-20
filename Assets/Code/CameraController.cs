@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 public class CameraController : MonoBehaviour {
   public Transform Player;
@@ -11,19 +10,19 @@ public class CameraController : MonoBehaviour {
 
   private Vector3 _min, _max;
 
-  public bool isFollowing { get; set; }
+  public bool IsFollowing { get; set; }
 
   public void Start() {
     _min = Bounds.bounds.min;
     _max = Bounds.bounds.max;
-    isFollowing = true;
+    IsFollowing = true;
   }
 
   public void Update() {
     var x = transform.position.x;
     var y = transform.position.y;
 
-    if(isFollowing) {
+    if(IsFollowing) {
       if(Mathf.Abs(x - Player.position.x) > Margin.x)
         x = Mathf.Lerp(x, Player.position.x, Smoothing.x * Time.deltaTime);
 
