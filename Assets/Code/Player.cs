@@ -21,6 +21,14 @@ public class Player : MonoBehaviour {
     _controller.SetHorizontalForce(Mathf.Lerp(_controller.Velocity.x, _normalizedHorizontalSpeed * MaxSpeed, Time.deltaTime * movementFactor));
   }
 
+  public void Kill() {
+    
+  }
+
+  public void RespawnAt(Transform spawnPoint) {
+    
+  }
+
   private void HandleInput() {
     if(Input.GetKey(KeyCode.D)) {
       _normalizedHorizontalSpeed = 1;
