@@ -9,24 +9,44 @@ public class Player : MonoBehaviour {
   public float SpeedAccelerationOnGround = 10.0f;
   public float SpeedAccelerationInAir = 5.0f;
 
-  public void Start() {
+  public bool IsDead { get; private set; }
+  
+  public void Awake() {
     _controller = GetComponent<CharacterController2D>();
     _isFacingRight = transform.localScale.x > 0;
   }
 
   public void Update() {
-    HandleInput();
+    if(!IsDead && transform.position.y <= -4.0f)
+      LevelManager.Instance.KillPlayer();
+
+    if(!IsDead)
+      HandleInput();
 
     var movementFactor = _controller.State.IsGrounded ? SpeedAccelerationOnGround : SpeedAccelerationInAir;
-    _controller.SetHorizontalForce(Mathf.Lerp(_controller.Velocity.x, _normalizedHorizontalSpeed * MaxSpeed, Time.deltaTime * movementFactor));
+    _controller.SetHorizontalForce(
+      IsDead
+        ? 0
+        : Mathf.Lerp(_controller.Velocity.x, _normalizedHorizontalSpeed * MaxSpeed, Time.deltaTime * movementFactor));
   }
 
   public void Kill() {
-    
+    _controller.HandleCollisions = false;
+    collider2D.enabled = false;
+    IsDead = true;
+
+    _controller.SetForce(new Vector2(0, 10.0f));
   }
 
   public void RespawnAt(Transform spawnPoint) {
-    
+    if(!_isFacingRight)
+      Flip();
+
+    IsDead = false;
+    collider2D.enabled = true;
+    _controller.HandleCollisions = true;
+
+    transform.position = spawnPoint.position;
   }
 
   private void HandleInput() {

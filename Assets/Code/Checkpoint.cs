@@ -19,7 +19,7 @@ public class Checkpoint : MonoBehaviour {
   }
 
   public void SpawnPlayer(Player player) {
-    
+    player.RespawnAt(transform);
   }
 
   public void AssignObjectToCheckpoint() {
